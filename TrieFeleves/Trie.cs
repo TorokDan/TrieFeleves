@@ -4,7 +4,7 @@ namespace TrieFeleves
 {
     public class Trie
     {
-        static readonly int _size = 26; // azért static mert a TriNode csak a statichoz fér hozzá...
+        static readonly int _size = 31; // azért static mert a TriNode csak a statichoz fér hozzá...
         protected class TrieNode
         {
             // IDE azt ajánlja h nagybetűvel kezdődjön.
@@ -67,7 +67,7 @@ namespace TrieFeleves
 
             for (int level = 0; level < key.Length; level++)
             {
-                int index = key[level] - 'a';
+                int index = GetIndex(key[level]);
 
                 tmp.Children[index] ??= new TrieNode();
 
@@ -76,7 +76,84 @@ namespace TrieFeleves
             
             tmp.End();
         }
-        
+
+        private int GetIndex(char charToIndex)
+        {
+            return charToIndex switch
+            {
+                'a' => 0,
+                'á' => 1,
+                'b' => 2,
+                'c' => 3,
+                'd' => 4,
+                'e' => 5,
+                'é' => 6,
+                'f' => 7,
+                'g' => 8,
+                'h' => 9,
+                'i' => 10,
+                'í' => 11,
+                'j' => 12,
+                'k' => 13,
+                'l' => 14,
+                'm' => 15,
+                'n' => 16,
+                'o' => 17,
+                'ó' => 18,
+                'ö' => 19,
+                'ő' => 20,
+                'p' => 21,
+                'r' => 22,
+                's' => 23,
+                't' => 24,
+                'u' => 25,
+                'ú' => 26,
+                'ü' => 27,
+                'ű' => 28,
+                'v' => 29,
+                'z' => 30,
+                _ => throw new Exception()
+            };
+        }
+
+        private char GetChar(int index)
+        {
+            return index switch
+            {
+                0 => 'a',
+                1 => 'á',
+                2 => 'b',
+                3 => 'c',
+                4 => 'd',
+                5 => 'e',
+                6 => 'é',
+                7 => 'f',
+                8 => 'g',
+                9 => 'h',
+                10 => 'i',
+                11 => 'í',
+                12 => 'j',
+                13 => 'k',
+                14 => 'l',
+                15 => 'm',
+                16 => 'n',
+                17 => 'o',
+                18 => 'ó',
+                19 => 'ö',
+                20 => 'ő',
+                21 => 'p',
+                22 => 'r',
+                23 => 's',
+                24 => 't',
+                25 => 'u',
+                26 => 'ú',
+                27 => 'ü',
+                28 => 'ű',
+                29 => 'v',
+                30 => 'z',
+                _ => throw new Exception()
+            };
+        }
 
         /// <summary>
         /// Visszaadja, hogy a keresett szó benne van-e a trie-ben
@@ -90,7 +167,7 @@ namespace TrieFeleves
 
             for (int level = 0; level < key.Length; level++)
             {
-                int index = key[level] - 'a';
+                int index = GetIndex(key[level]);
 
                 if (tmp.Children[index] == null)
                     return false;
@@ -111,8 +188,8 @@ namespace TrieFeleves
                 if (actualNode.Children[index] != null)
                 {
                     if (actualNode.Children[index].IsEndOfWord)
-                        method?.Invoke(word+(char)(index+'a'));
-                    BejarasRek(actualNode.Children[index], word+((char)(index+'a')), method);
+                        method?.Invoke(word+GetChar(index));
+                    BejarasRek(actualNode.Children[index], word+GetChar(index), method);
                 }
             }
         }

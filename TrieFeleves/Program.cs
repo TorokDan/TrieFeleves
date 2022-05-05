@@ -6,15 +6,14 @@ namespace TrieFeleves
     {
         static void Main(string[] args)
         {
-            // Trie trie = new Trie('$');
+            Trie trie = new Trie('$');
             
-            // trie.Insert(new string[] {"alma", "haz", "kalap", "cipo" });
+            trie.Insert(new string[] {"alma", "ház", "kalap", "cipő" });
             // trie.Insert("alma$korte$haz$kalap$cipo");
             
-            // Console.WriteLine(trie.Search("alma"));
+            Console.WriteLine(trie.Search("ház"));
             
-            // trie.Bejaras();
-            Console.WriteLine('x' - 'a');
+            trie.Bejaras();
         }
     }
 }
