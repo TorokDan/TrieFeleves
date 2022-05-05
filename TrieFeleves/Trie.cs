@@ -4,7 +4,7 @@ namespace TrieFeleves
 {
     public class Trie
     {
-        static readonly int _size = 31; // azért static mert a TriNode csak a statichoz fér hozzá...
+        static readonly int _size = 34; // azért static mert a TriNode csak a statichoz fér hozzá...
         protected class TrieNode
         {
             // IDE azt ajánlja h nagybetűvel kezdődjön.
@@ -111,7 +111,10 @@ namespace TrieFeleves
                 'ü' => 27,
                 'ű' => 28,
                 'v' => 29,
-                'z' => 30,
+                'w' => 30,
+                'x' => 31,
+                'y' => 32,
+                'z' => 33,
                 _ => throw new Exception()
             };
         }
@@ -150,7 +153,10 @@ namespace TrieFeleves
                 27 => 'ü',
                 28 => 'ű',
                 29 => 'v',
-                30 => 'z',
+                30 => 'w',
+                31 => 'x',
+                32 => 'y',
+                33 => 'z',
                 _ => throw new Exception()
             };
         }
@@ -183,7 +189,7 @@ namespace TrieFeleves
 
         private void BejarasRek(TrieNode actualNode, string word, BejaroHandler method)
         {
-            for (var index = 0; index < actualNode.Children.Length; index++)
+            for (int index = 0; index < actualNode.Children.Length; index++)
             {
                 if (actualNode.Children[index] != null)
                 {
@@ -192,6 +198,41 @@ namespace TrieFeleves
                     BejarasRek(actualNode.Children[index], word+GetChar(index), method);
                 }
             }
+        }
+
+        /// <summary>
+        /// Keres egy szót az eddig felvett szavak közül, ami anagrammája a megadott szónak.
+        /// </summary>
+        /// <param name="key"></param>
+        public string[] SearchAnagram(string key)
+        {
+            Lista<string> lista = new Lista<string>();
+            SearchAnagramRek(_root, key, string.Empty, lista);
+            return lista.MakeItArray();
+        }
+
+        private void SearchAnagramRek(TrieNode actualNode, string key, string word, Lista<string> lista)
+        {
+            for (int index = 0; index < actualNode.Children.Length; index++)
+            {
+                if (actualNode.Children[index] != null)
+                {
+                    if (key.Contains(GetChar(index)))
+                    {
+                        if (actualNode.Children[index].IsEndOfWord)
+                            lista.Add(word+GetChar(index));
+                        SearchAnagramRek(actualNode.Children[index], key.Remove(key.IndexOf(GetChar(index)),1), word+GetChar(index), lista);
+                    }
+                }
+            }
+        }
+
+        private bool CanBeAnagram(char charToCheck, ref string key)
+        {
+            if (!key.Contains(charToCheck))
+                return false;
+            key = key.Remove(key.IndexOf(charToCheck), 1);
+            return true;
         }
     }
 }
