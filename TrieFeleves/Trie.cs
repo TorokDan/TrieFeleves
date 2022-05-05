@@ -24,6 +24,15 @@ namespace TrieFeleves
             }
 
             public void End() => _isEndOfWord = true;
+            public void DeleteEnd() => _isEndOfWord = false;
+
+            public bool AllChildNull()
+            {
+                int index = 0;
+                while (index < _children.Length && _children[index] == null)
+                    index++;
+                return !(index < _children.Length);
+            }
         }
 
         private TrieNode _root;
@@ -201,7 +210,7 @@ namespace TrieFeleves
         }
 
         /// <summary>
-        /// Keres egy szót az eddig felvett szavak közül, ami anagrammája a megadott szónak.
+        /// Megkeresi a megadott szó anagrammáit.
         /// </summary>
         /// <param name="key"></param>
         public string[] SearchAnagram(string key)
@@ -227,12 +236,51 @@ namespace TrieFeleves
             }
         }
 
-        private bool CanBeAnagram(char charToCheck, ref string key)
+        /// <summary>
+        /// Törli a megadott szót a trie-ből.
+        /// </summary>
+        /// <param name="key"></param>
+        public void Delete(string key)
         {
-            if (!key.Contains(charToCheck))
-                return false;
-            key = key.Remove(key.IndexOf(charToCheck), 1);
-            return true;
+            DeleteRek(_root, key, 0);
+
         }
+
+        /// <summary>
+        /// Akkor tér vissza igazzal, ha törölt egy elemet.
+        /// </summary>
+        /// <param name="actualNode"></param>
+        /// <param name="key"></param>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        private bool DeleteRek(TrieNode actualNode, string key, int level)
+        {
+            int index = GetIndex(key[level]);
+            TrieNode node = actualNode.Children[index];
+            bool deleted = false;
+            if (node != null)
+            {
+                if (level != key.Length - 1)
+                {
+                    deleted = DeleteRek(node, key, ++level);
+                }
+                // végigment a rekurzió, és a szó benne is van a trieben
+                if ((level == key.Length-1 && node.IsEndOfWord) || deleted)
+                {
+                    node.DeleteEnd();
+                    // nincs alatta gyerek
+                    if (node.AllChildNull())
+                    {
+                        actualNode.Children[index] = null;
+                        return true;
+                    }
+                }
+
+                
+                return false;
+            }
+            throw new WordNotInTrieException(key);
+        }
+
     }
 }

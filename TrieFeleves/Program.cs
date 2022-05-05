@@ -13,8 +13,9 @@ namespace TrieFeleves
             
             // Console.WriteLine(trie.Search("ház"));
             string[] asd = trie.SearchAnagram("kiskegyed");
-            ;
 
+            trie.Bejaras();
+            trie.Delete("alom");
             trie.Bejaras();
         }
     }
