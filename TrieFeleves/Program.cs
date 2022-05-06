@@ -15,7 +15,7 @@ namespace TrieFeleves
             string[] asd = trie.SearchAnagram("kiskegyed");
 
             trie.Bejaras();
-            trie.Delete("alom");
+            trie.Delete("alma");
             trie.Bejaras();
         }
     }

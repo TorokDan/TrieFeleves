@@ -4,11 +4,10 @@ namespace TrieFeleves
 {
     public class Trie
     {
-        static readonly int _size = 34; // azért static mert a TriNode csak a statichoz fér hozzá...
+        private static readonly int Size = 34;
         protected class TrieNode
         {
-            // IDE azt ajánlja h nagybetűvel kezdődjön.
-            private TrieNode[] _children;
+            private readonly TrieNode[] _children;
             private bool _isEndOfWord;
 
             public TrieNode[] Children => _children;
@@ -16,11 +15,9 @@ namespace TrieFeleves
             public TrieNode()
             {
                 _isEndOfWord = false;
-                _children = new TrieNode[_size];
+                _children = new TrieNode[Size];
                 for (int i = 0; i < _children.Length; i++)
-                {
                     _children[i] = null;
-                }
             }
 
             public void End() => _isEndOfWord = true;
@@ -35,8 +32,8 @@ namespace TrieFeleves
             }
         }
 
-        private TrieNode _root;
-        private char _endChar;
+        private readonly TrieNode _root;
+        private readonly char _endChar;
 
         public Trie(char endChar)
         {
@@ -53,7 +50,7 @@ namespace TrieFeleves
         public void Insert(string[] keys)
         {
             foreach (string key in keys)
-                this.InsertAKey(key);
+                InsertAKey(key);
         }
         
         /// <summary>
@@ -62,7 +59,7 @@ namespace TrieFeleves
         /// <param name="key"></param>
         public void Insert(string key)
         {
-            this.Insert(key.Split(_endChar));
+            Insert(key.Split(_endChar));
         }
         
         /// <summary>
@@ -86,7 +83,7 @@ namespace TrieFeleves
             tmp.End();
         }
 
-        private int GetIndex(char charToIndex)
+        private static int GetIndex(char charToIndex)
         {
             return charToIndex switch
             {
@@ -124,11 +121,11 @@ namespace TrieFeleves
                 'x' => 31,
                 'y' => 32,
                 'z' => 33,
-                _ => throw new Exception()
+                _ => throw new NotDefinedCharacter(charToIndex)
             };
         }
 
-        private char GetChar(int index)
+        private static char GetChar(int index)
         {
             return index switch
             {
@@ -166,7 +163,7 @@ namespace TrieFeleves
                 31 => 'x',
                 32 => 'y',
                 33 => 'z',
-                _ => throw new Exception()
+                _ => throw new NotDefinedCharacter(index)
             };
         }
 
@@ -196,7 +193,7 @@ namespace TrieFeleves
 
         public void Bejaras(BejaroHandler method = null) => BejarasRek(_root, string.Empty, method ??= Console.WriteLine);
 
-        private void BejarasRek(TrieNode actualNode, string word, BejaroHandler method)
+        private static void BejarasRek(TrieNode actualNode, string word, BejaroHandler method)
         {
             for (int index = 0; index < actualNode.Children.Length; index++)
             {
@@ -220,19 +217,18 @@ namespace TrieFeleves
             return lista.MakeItArray();
         }
 
-        private void SearchAnagramRek(TrieNode actualNode, string key, string word, Lista<string> lista)
+        private static void SearchAnagramRek(TrieNode actualNode, string key, string word, Lista<string> lista)
         {
             for (int index = 0; index < actualNode.Children.Length; index++)
             {
                 if (actualNode.Children[index] != null)
-                {
                     if (key.Contains(GetChar(index)))
                     {
                         if (actualNode.Children[index].IsEndOfWord)
-                            lista.Add(word+GetChar(index));
-                        SearchAnagramRek(actualNode.Children[index], key.Remove(key.IndexOf(GetChar(index)),1), word+GetChar(index), lista);
+                            lista.Add(word + GetChar(index));
+                        SearchAnagramRek(actualNode.Children[index], key.Remove(key.IndexOf(GetChar(index)), 1),
+                            word + GetChar(index), lista);
                     }
-                }
             }
         }
 
@@ -253,34 +249,29 @@ namespace TrieFeleves
         /// <param name="key"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        private bool DeleteRek(TrieNode actualNode, string key, int level)
+        private static bool DeleteRek(TrieNode actualNode, string key, int level)
         {
             int index = GetIndex(key[level]);
             TrieNode node = actualNode.Children[index];
             bool deleted = false;
-            if (node != null)
+            if (actualNode.Children[index] == null) throw new WordNotInTrieException(key);
+            if (level != key.Length - 1)
             {
-                if (level != key.Length - 1)
-                {
-                    deleted = DeleteRek(node, key, ++level);
-                }
-                // végigment a rekurzió, és a szó benne is van a trieben
-                if ((level == key.Length-1 && node.IsEndOfWord) || deleted)
-                {
-                    node.DeleteEnd();
-                    // nincs alatta gyerek
-                    if (node.AllChildNull())
-                    {
-                        actualNode.Children[index] = null;
-                        return true;
-                    }
-                }
-
-                
-                return false;
+                deleted = DeleteRek(node, key, ++level);
             }
-            throw new WordNotInTrieException(key);
+            // végigment a rekurzió, és a szó benne is van a trieben
+            if ((level != key.Length - 1 || !node.IsEndOfWord) && !deleted) return false;
+            node.DeleteEnd();
+            // nincs alatta gyerek
+            if (!node.AllChildNull()) return false;
+            actualNode.Children[index] = null;
+            return true;
         }
 
+        public void ChangeWord(string keyFrom, string keyTo)
+        {
+            Delete(keyFrom);
+            Insert(keyTo);
+        }
     }
 }
