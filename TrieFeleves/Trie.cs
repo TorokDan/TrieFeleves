@@ -4,7 +4,8 @@ namespace TrieFeleves
 {
     public class Trie
     {
-        private static readonly int Size = 34;
+        private const int Size = 34;
+
         protected class TrieNode
         {
             private readonly TrieNode[] _children;
