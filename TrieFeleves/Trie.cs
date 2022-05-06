@@ -49,8 +49,8 @@ namespace TrieFeleves
         /// <param name="keys"></param>
         public void Insert(string[] keys)
         {
-            foreach (string key in keys)
-                InsertAKey(key);
+            foreach (var t in keys)
+                InsertAKey(t);
         }
         
         /// <summary>
@@ -59,7 +59,27 @@ namespace TrieFeleves
         /// <param name="key"></param>
         public void Insert(string key)
         {
-            Insert(key.Split(_endChar));
+            key = key.ToLower();
+            for (int i = 0; i < key.Length; i++)
+            {
+                if (key[i] != ' ')
+                {
+                    int index = -1;
+
+                    try
+                    {
+                        index = GetIndex(key[i]);
+                    }
+                    catch (NotDefinedCharacter e)
+                    {
+                        index = -1;
+                    }
+
+                    if (index == -1)
+                        key = key.Remove(i, 1);
+                }
+            }
+            Insert(key.Split(' '));
         }
         
         /// <summary>
@@ -68,9 +88,9 @@ namespace TrieFeleves
         /// <param name="key"></param>
         private void InsertAKey(string key)
         {
-            key = key.ToLower();
+            if (Search(key)) return;
             TrieNode tmp = _root;
-
+            key = key.ToLower();
             for (int level = 0; level < key.Length; level++)
             {
                 int index = GetIndex(key[level]);
@@ -79,8 +99,9 @@ namespace TrieFeleves
 
                 tmp = tmp.Children[index];
             }
-            
+                
             tmp.End();
+
         }
 
         private static int GetIndex(char charToIndex)
@@ -206,6 +227,15 @@ namespace TrieFeleves
             }
         }
 
+        public void WriteAnagramms(string key, BejaroHandler _method = null)
+        {
+            foreach (var anagram in SearchAnagram(key))
+            {
+                if (_method == null)
+                    _method = Console.WriteLine;
+                _method?.Invoke(anagram);
+            }
+        }
         /// <summary>
         /// Megkeresi a megadott szó anagrammáit.
         /// </summary>
@@ -213,8 +243,8 @@ namespace TrieFeleves
         public string[] SearchAnagram(string key)
         {
             Lista<string> lista = new Lista<string>();
-            SearchAnagramRek(_root, key, string.Empty, lista);
-            return lista.MakeItArray();
+            SearchAnagramRek(_root, key.ToLower(), string.Empty, lista);
+            return lista.Length == 0 ? lista.MakeItArray() : throw new NoAnagramException(key);
         }
 
         private static void SearchAnagramRek(TrieNode actualNode, string key, string word, Lista<string> lista)
@@ -236,11 +266,7 @@ namespace TrieFeleves
         /// Törli a megadott szót a trie-ből.
         /// </summary>
         /// <param name="key"></param>
-        public void Delete(string key)
-        {
-            DeleteRek(_root, key, 0);
-
-        }
+        public void Delete(string key) => DeleteRek(_root, key.ToLower(), 0);
 
         /// <summary>
         /// Akkor tér vissza igazzal, ha törölt egy elemet.
@@ -256,9 +282,7 @@ namespace TrieFeleves
             bool deleted = false;
             if (actualNode.Children[index] == null) throw new WordNotInTrieException(key);
             if (level != key.Length - 1)
-            {
                 deleted = DeleteRek(node, key, ++level);
-            }
             // végigment a rekurzió, és a szó benne is van a trieben
             if ((level != key.Length - 1 || !node.IsEndOfWord) && !deleted) return false;
             node.DeleteEnd();
@@ -270,8 +294,8 @@ namespace TrieFeleves
 
         public void ChangeWord(string keyFrom, string keyTo)
         {
-            Delete(keyFrom);
-            Insert(keyTo);
+            Delete(keyFrom.ToLower());
+            Insert(keyTo.ToLower());
         }
     }
 }

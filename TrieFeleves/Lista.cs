@@ -22,8 +22,9 @@ namespace TrieFeleves
         }
 
         private Node _head;
-        private int _count;
+        private int _length;
 
+        public int Length => _length;
         public void Add(T value)
         {
             if (_head == null)
@@ -42,12 +43,12 @@ namespace TrieFeleves
                 prev.Next = new Node(value);
             }
 
-            _count++;
+            _length++;
         }
 
         public T[] MakeItArray()
         {
-            T[] answer = new T[_count];
+            T[] answer = new T[_length];
             int counter = 0;
 
             Node node = _head;
