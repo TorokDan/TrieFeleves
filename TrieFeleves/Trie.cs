@@ -245,7 +245,7 @@ namespace TrieFeleves
         {
             Lista<string> lista = new Lista<string>();
             SearchAnagramRek(_root, key.ToLower(), string.Empty, lista);
-            return lista.Length == 0 ? lista.MakeItArray() : throw new NoAnagramException(key);
+            return lista.Length != 0 ? lista.MakeItArray() : throw new NoAnagramException(key);
         }
 
         private static void SearchAnagramRek(TrieNode actualNode, string key, string word, Lista<string> lista)

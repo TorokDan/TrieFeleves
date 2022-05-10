@@ -7,7 +7,7 @@ namespace TrieFeleves
         public NoAnagramException(string key)
             : base($"\"{key}\" has no anagram in the list")
         {
-            throw new NotImplementedException();
+            
         }
     }
 }
